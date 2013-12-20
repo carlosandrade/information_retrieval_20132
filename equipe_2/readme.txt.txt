@@ -1,7 +1,7 @@
 UNIVERSIDADE FEDERAL DA BAHIA
 MATC96 - Organização e Recuperação da Informação
 Prof.: Carlos Andrade
-Alunos: André Oliveira, Lucas Bulcão, Luís Emanuel e Thiago Araújo
+Alunos: André Oliveira, Lucas Bulcão, Luís Emanuel e Tiago Araújo
 
 Hodiernamente, é perceptível o caos existente no cenário do trânsito na maioria das cidades brasileira, são inúmeros os incidentes ocorridos diariamente, sejam eles acidentes, incêndios, obras ou qualquer outro evento que possa impactar na mobilidade urbana, um dos assuntos mais comentados atualmente.  Não obstante, é notório, também, a vontade, bem como a disponibilidade das pessoas colaborarem com a divulgação dessa informação.
 Associado a isso, o lançamento de smartphones de baixo custo, o aumento relevante na penetração deste tipo de aparelho entre os brasileiros corrobora a disseminação de informações relacionadas a incidentes ocorridos no trânsito, ou seja, está mais fácil e, sobretudo, cada vez  mais comum as pessoas publicarem na web as eventualidades vivenciadas no trânsito. Todavia, essa informação fica espalhada nas mais diversas redes sociais ou em sites especializados nesse tipo de informação, fazendo com que aqueles que buscam por esses dados tenham que pesquisar em diferentes veículos de comunicação, o que pode ser muito trabalhoso e pouco eficiente. Isto posto, faz-se necessário a criação de um meio de comunicação que possa minerar informações no tocante a incidentes de trânsito e, deste modo, propiciar ao usuário a comodidade de saber tudo que está acontecendo sem a necessidade de realizar inúmeras pesquisas para tal propósito.    
