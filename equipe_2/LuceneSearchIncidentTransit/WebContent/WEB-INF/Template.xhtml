@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+ <title>MATC96 - Recuperação da Informação</title>
+ <style> 
+	.ui-widget {  
+	   font-size: 11px !important;  
+	}
+</style>
+ </h:head>
+	<h:body style="background-color: #003399">
+     <p:layout fullPage="true">
+				<p:layoutUnit position="north" size="80">
+				<table style="margin-left:40px">
+				<tr>
+				<td>
+					<h1>MATC96 - Recupera&ccedil;&atilde;o da Informa&ccedil;&atilde;o</h1>
+				</td>
+				<td style="margin-left:20px">
+					<p:inputText id="keyword" value="#{watermarkBean.keyword}" required="true" label="keyword"  style="width: 460px"/>
+					<p:watermark for="keyword" value="digite um endereço...(Ex.: Av. Adhemar de Barros - Salvador, BA)" />
+				</td>
+				<td>
+					<p:selectOneMenu value="" for="keyword">  
+			            <f:selectItem itemLabel="tipo de incidente..." itemValue="" />  
+			            <f:selectItem itemLabel="Acidente" itemValue="1" />  
+			            <f:selectItem itemLabel="Engarrafamento" itemValue="2" />  
+			            <f:selectItem itemLabel="Incêncdio" itemValue="3" />  
+			            <f:selectItem itemLabel="Barreira" itemValue="4" />  
+			        </p:selectOneMenu>
+				</td>
+				</tr>
+				</table>
+				</p:layoutUnit>
+
+				<p:layoutUnit position="west" size="200" header="Filtros">
+				<!-- MENU LATERAL -->
+				<h:form>
+					
+				</h:form>
+				<!-- /MENU LATERAL -->
+				</p:layoutUnit>
+				<p:layoutUnit position="center">
+						<ui:insert name="conteudo"/>
+				</p:layoutUnit>
+			</p:layout>
+</h:body>
+</html>
