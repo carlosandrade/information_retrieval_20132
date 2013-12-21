@@ -11,7 +11,7 @@ Requisitos
 Execução
 --------
 
-Para executar a previa da wiki rose seguinte comando
+Para executar a previa da wiki de o seguinte comando
 
 ```
 $ python manage.py
