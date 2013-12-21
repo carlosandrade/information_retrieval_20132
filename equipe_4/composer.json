@@ -1,0 +1,26 @@
+{
+    "name": "InformationRetrieval",
+    "type": "application",
+    "description": "A simple PHP Web Scraper, Indexer, Searcher",
+    "keywords": ["scraper", "index", "search", "goutte", "lucene"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Helder Santana",
+            "email": "contato@heldersantana.net"
+        },
+        {
+            "name": "Anderson Guimaraes",
+            "email": "abguimares@gmail.com"
+        },
+        {
+            "name": "Lucas Lima",
+            "email": "lukaslima3@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "fabpot/goutte": "dev-master",
+        "bojaspus/zendsearch": "dev-master"
+    }
+}
