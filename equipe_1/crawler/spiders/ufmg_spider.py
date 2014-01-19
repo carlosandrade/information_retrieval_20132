@@ -30,6 +30,16 @@ class UfmgSpider(BaseSpider):
       item = IesItem()
       item['nome'] = person.xpath('tr/td/table/tr[1]/td[2]/strong/text()').extract()
       item['area'] = person.xpath('tr/td/table/tr[1]/td[2]/text()').extract()
+      temp = str(item['area'])
+
+      begin = temp.find(') ') + 2
+      end = -1
+
+      if temp[begin] == '"':
+        begin+= 1
+        end-= 1
+
+      item['area'] = temp[begin:end]
       item['cleanNome'] = self.cleanup(''.join(item['nome']))
 
       items.append(item)
