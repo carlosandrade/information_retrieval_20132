@@ -7,11 +7,10 @@ from scrapy.item import Item, Field
 
 class PoliticoItem(Item):
     nome = Field()
+    clean_nome = Field()
     aniversario = Field()
-    profissao = Field()
     partido = Field()
     UF = Field()
     diplomacao = Field()
     telefone = Field()
-    fax = Field()
     legislaturas = Field()

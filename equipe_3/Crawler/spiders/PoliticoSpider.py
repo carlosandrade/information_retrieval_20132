@@ -1,11 +1,17 @@
+# -*- coding: latin1 -*-
 # PoliticoSpyder
+
 import re
 
 from scrapy.spider import BaseSpider
 from scrapy.selector import Selector
 from scrapy.http import FormRequest
 
+import nltk
+from nltk.corpus import stopwords
+
 from politico.items import PoliticoItem
+
 
 class PoliticoSpyder(BaseSpider):
 
@@ -14,36 +20,38 @@ class PoliticoSpyder(BaseSpider):
     start_urls = ['http://www2.camara.leg.br/deputados/pesquisa/']
 
     def parse(self, response):
-        self.itens = []
+        """
+        Função principal da aranha, delega a atividade que ela exerce
+        """
 
         sel = Selector(response)
         form = sel.xpath('//*[@id="formDepAtual"]')
         deputados = form.xpath('//select[@id="deputado"]/option')
 
-        pol = PoliticoItem()
-
-        for deputado in deputados:
-            pol = FormRequest(
+        for deputado in deputados[0:10]:
+            yield FormRequest(
                 url=form.xpath('@action').extract()[0],
                 formdata={
                     'deputado': deputado.xpath('@value').extract()[0],
                     'rbDeputado': 'IC'
                 },
-                meta={'pol': pol},
                 callback=self.save_deputado
             )
-            
-            self.itens.append(pol)
-
-        return self.itens
 
     def save_deputado(self, response):
+        """
+        Função que grava os dados coletados da aranha no "banco de dados"
+        """
+
         sel = Selector(response)
-        pol = response.meta['pol']
+        pol = PoliticoItem()
 
-        #pol = PoliticoItem()
+        pol['nome'] = sel.xpath(
+            '//*[@id="content"]//ul[@class="visualNoMarker"]/li[1]/text()').extract()[0]
 
-        pol['nome'] = sel.xpath('//*[@id="content"]//ul[@class="visualNoMarker"]/li[1]/text()').extract()[0]
+        print pol['nome']
+
+        pol['clean_nome'] = self.cleanup(pol['nome']);
 
         pol['aniversario'] = self.format(sel.xpath(
             '//*[@id="content"]//ul[@class="visualNoMarker"]/li[2]/text()').extract()[0],
@@ -69,10 +77,16 @@ class PoliticoSpyder(BaseSpider):
             '//*[@id="content"]//ul[@class="visualNoMarker"]/li[5]/text()').extract()[0],
             r"\d{2}/\d{2}")
 
-        #itens.append(pol)
         return pol
 
     def format(self, data, format, filter):
+        """
+        Função para tratar o campo o texto coletado da aranha
+
+        :param format: O formato esperado.
+        :param filter: O formato de saida.
+        """
+
         if type(filter) == int:
             filter = "\\" + str(filter)
 
@@ -83,4 +97,21 @@ class PoliticoSpyder(BaseSpider):
         return _data
 
     def find(self, data, format):
+        """
+        Função para tratar o campo o texto coletado da aranha,
+        retorna todas as ocorrencias de formart
+
+        :param format: O formato esperado.
+        """
+
         return re.findall(format, data)
+
+    def cleanup(self, text):
+        stopset = set(stopwords.words('portuguese'))
+        tokens = nltk.word_tokenize(text)
+
+        clean = [
+            token for token in tokens if not token in stopset and len(token) > 2
+        ]
+
+        return clean
