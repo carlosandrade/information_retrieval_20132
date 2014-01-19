@@ -10,6 +10,10 @@ BOT_NAME = 'crawler'
 
 SPIDER_MODULES = ['crawler.spiders']
 NEWSPIDER_MODULE = 'crawler.spiders'
+COOKIES_ENABLED = False
+DOWNLOAD_DELAY = 2
+FEED_FORMAT = 'json'
+FEED_URI = 'file:///tmp/export.jso'
 
 # DEPTH_LIMIT = 1
 
