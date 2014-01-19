@@ -3,6 +3,11 @@ include 'vendor/autoload.php';
 
 use ZendSearch\Lucene;
 
+/**
+ * Class Search
+ *
+ * Efetua busca de informaçoes nos indexes
+ */
 class Search {
 
     /**
@@ -12,35 +17,39 @@ class Search {
      */
     public function query($query)
     {
+        // Definiçao dos caminhos dos arquivos
         $dir = realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "data" .DIRECTORY_SEPARATOR;
         $jsonDir = $dir . "json";
         $indexDir = $dir . "index";
 
-        // Percorre os indices
-        $files = scandir($jsonDir);
-        foreach ($files as $file) {
-            if ($file == '.' || $file == '..') {
-                continue;
-            }
+        // Abre o indice
+        $index = Lucene\Lucene::open($indexDir . DIRECTORY_SEPARATOR . 'futebol'); // Abre index
 
-            $indexName = substr($file, 0, -5);
-            $index = Lucene\Lucene::open($indexDir . DIRECTORY_SEPARATOR . $indexName); // Abre index
+        // prepara a query
+        $title_query = "title:($query)";
+        $localization_query = "localization:($query)";
+        $group_query = "group:($query)";
+        $taxonomy_query = "taxonomy:($query)";
 
-            $hits = $index->find($query); // Executa query
+        // Monta a query
+        $fullQuery = Lucene\Search\QueryParser::parse("$title_query $taxonomy_query $group_query $localization_query");
+        // Faz a busca
+        $hits = $index->find($query); // Executa query
 
-            // Lista resultados
-            foreach ($hits as $hit) {
-                $document = $hit->getDocument();
+        // Lista resultados
+        foreach ($hits as $hit) {
+            $document = $hit->getDocument();
 
-                // return a Zend\Search\Lucene\Field object
-                // from the Zend\Search\Lucene\Document
-                echo "<h3>" . $document->getFieldValue('url') . "</h3><br />";
-                //echo "<p>" . $hit->text . "</p><br /><br />";
-            }
+            echo "Title: " . $document->getFieldValue('title') . "\n";
+            echo "Url: " . $document->getFieldValue('url') . "\n";
+            echo "Group: " . $document->getFieldValue('group') . "\n\n";
         }
+
+        echo "Total: " . count($hits) . "\n\n";
     }
 }
 
-$q = !empty($_GET['q']) ? $_GET['q'] : 'CBF';
+// instacia um buscador e faz uma busca
+$q = !empty($_GET['q']) ? $_GET['q'] : 'Vitoria';
 $sc = new Search();
 $sc->query($q);
