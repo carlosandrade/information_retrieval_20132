@@ -1,7 +1,5 @@
 import nltk
 from scrapy.spider import BaseSpider
-#from scrapy.contrib.spiders import CrawlSpider, Rule
-#from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
 from scrapy.selector import Selector
 from crawler.items import UniItem
 from nltk.corpus import stopwords
@@ -13,8 +11,6 @@ class UniSpider(BaseSpider):
      'http://conteudoweb.capes.gov.br/conteudoweb/ProjetoRelacaoCursosServlet?acao=pesquisarIes&codigoArea=10300007&descricaoArea=CI%CANCIAS+EXATAS+E+DA+TERRA+&descricaoAreaConhecimento=CI%CANCIA+DA+COMPUTA%C7%C3O&descricaoAreaAvaliacao=CI%CANCIA+DA+COMPUTA%C7%C3O'
   ]
 
- #rules = (Rule ( SgmlLinkExtractor( allow=("conteudoweb.capes.gov.br", ), ), callback="parse_items", follow= True),)
-
   # Funcao para remover stopwords de um texto
   def cleanup(self, text):
     # Obtem conjunto de stopwords em portugues, e as armazena
@@ -24,7 +20,7 @@ class UniSpider(BaseSpider):
     clean = [token for token in tokens if not token in stopset and len(token) > 2]
     return clean
 
-  def parse_items(self, response):
+  def parse(self, response):
     sel = Selector(response)
     sites = sel.xpath('//*[@id="tabela"]/tbody/tr')
     items = []
@@ -38,6 +34,37 @@ class UniSpider(BaseSpider):
       item['m'] = site.xpath('td[4]/text()').extract()
       item['d'] = site.xpath('td[5]/text()').extract()
       item['f'] = site.xpath('td[6]/text()').extract()
+
+    # request.meta['it'] = item
+    # request = Request('http://www.dcc.ufmg.br/pos/pessoas/professores2.php?tipo=PE',
+    #                   callback=self.parse_ufmg)
+
+    return items
+
+  def parse_ufmg(self, response):
+    sel = Selector(response)
+    teachers = sel.xpath('/html/body/table/tr[2]/td[2]/table/tr[2]/td[2]/table/tr[2]/td/table')
+
+    items = []
+
+    for person in teachers:
+      item = IesItem2()
+      it = response.meta['it']
+      item['nome'] = person.xpath('tr/td/table/tr[1]/td[2]/strong/text()').extract()
+      item['uf'] = it['uf']
+      item['ies'] = it['ies']
+      item['area'] = person.xpath('tr/td/table/tr[1]/td[2]/text()').extract()
+      temp = str(item['area'])
+
+      begin = temp.find(') ') + 2
+      end = -1
+
+      if temp[begin] == '"':
+        begin+= 1
+        end-= 1
+
+      item['area'] = temp[begin:end]
+      item['cleanNome'] = self.cleanup(''.join(item['nome']))
 
       items.append(item)
 

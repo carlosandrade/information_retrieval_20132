@@ -28,20 +28,13 @@ class UfmgSpider(BaseSpider):
 
     for person in teachers:
       item = IesItem()
-      item['nome'] = person.xpath('tr/td/table/tr[1]/td[2]/strong/text()').extract()
-      item['area'] = person.xpath('tr/td/table/tr[1]/td[2]/text()').extract()
-      temp = str(item['area'])
-
-      begin = temp.find(') ') + 2
-      end = -1
-
-      if temp[begin] == '"':
-        begin+= 1
-        end-= 1
-
-      item['area'] = temp[begin:end]
+      item['nome'] = person.xpath('tr/td/table/tr[1]/td[2]/strong').extract()
       item['cleanNome'] = self.cleanup(''.join(item['nome']))
 
-      items.append(item)
+      a = str(person.xpath('tr/td/table/tr[1]/td[2]/text()').extract())
+      a = a.replace(' .','').replace('.','').replace(' -',')').replace('"','')
+      begin = a.find(')') + 2
+      
+      item['area'] = a[begin:]     
 
-    return items
+      yield item
