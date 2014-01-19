@@ -1,5 +1,7 @@
 import nltk
 from scrapy.spider import BaseSpider
+#from scrapy.contrib.spiders import CrawlSpider, Rule
+#from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
 from scrapy.selector import Selector
 from crawler.items import UniItem
 from nltk.corpus import stopwords
@@ -11,6 +13,8 @@ class UniSpider(BaseSpider):
      'http://conteudoweb.capes.gov.br/conteudoweb/ProjetoRelacaoCursosServlet?acao=pesquisarIes&codigoArea=10300007&descricaoArea=CI%CANCIAS+EXATAS+E+DA+TERRA+&descricaoAreaConhecimento=CI%CANCIA+DA+COMPUTA%C7%C3O&descricaoAreaAvaliacao=CI%CANCIA+DA+COMPUTA%C7%C3O'
   ]
 
+ #rules = (Rule ( SgmlLinkExtractor( allow=("conteudoweb.capes.gov.br", ), ), callback="parse_items", follow= True),)
+
   # Funcao para remover stopwords de um texto
   def cleanup(self, text):
     # Obtem conjunto de stopwords em portugues, e as armazena
@@ -20,7 +24,7 @@ class UniSpider(BaseSpider):
     clean = [token for token in tokens if not token in stopset and len(token) > 2]
     return clean
 
-  def parse(self, response):
+  def parse_items(self, response):
     sel = Selector(response)
     sites = sel.xpath('//*[@id="tabela"]/tbody/tr')
     items = []
