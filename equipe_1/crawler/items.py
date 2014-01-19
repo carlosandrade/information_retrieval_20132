@@ -18,3 +18,10 @@ class IesItem(Item):
 	nome = Field()
 	area = Field()
 	cleanNome = Field()
+
+class IesItem2(Item):
+	nome = Field()
+	area = Field()
+	cleanNome = Field()
+	uf = Field()
+	ies = Field()
