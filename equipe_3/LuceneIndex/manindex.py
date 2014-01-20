@@ -20,6 +20,7 @@
 
 import os, re, sys, lucene
 from subprocess import *
+import json
 
 from java.io import File
 from org.apache.lucene.analysis.miscellaneous import LimitTokenCountAnalyzer
@@ -38,13 +39,13 @@ def indexDirectory(dir):
 
 
 def indexFile(dir, filename):
-
+    
     path = os.path.join(dir, filename)
     print "  File: ", filename
 
     if filename.endswith('.gz'):
         child = Popen('gunzip -c ' + path + ' | groff -t -e -E -mandoc -Tascii | col -bx', shell=True, stdout=PIPE, cwd=os.path.dirname(dir)).stdout
-        command, section = re.search('^(.*)\.(.*)\.gz$', filename).groups()
+        command, section = re.search('^(.*)\.(.*)\.json$', filename).groups()
     else:
         child = Popen('groff -t -e -E -mandoc -Tascii ' + path + ' | col -bx',
                       shell=True, stdout=PIPE, cwd=os.path.dirname(dir)).stdout
@@ -67,18 +68,33 @@ def indexFile(dir, filename):
                         re.MULTILINE | re.DOTALL)
     description = matches and matches.group(1) or ''
 
-    doc = Document()
-    doc.add(Field("command", command, StringField.TYPE_STORED))
-    doc.add(Field("section", section, StringField.TYPE_STORED))
-    doc.add(Field("name", name.strip(), TextField.TYPE_STORED))
-    doc.add(Field("synopsis", synopsis.strip(), TextField.TYPE_STORED))
-    doc.add(Field("keywords", ' '.join((command, name, synopsis, description)),
-                  TextField.TYPE_NOT_STORED))
-    doc.add(Field("filename", os.path.abspath(path), StringField.TYPE_STORED))
+    if section == 'json':
+    	json_data=open(path)
+    	data = json.load(json_data)
+            
+    	for x in data:
+	    doc = Document()
+	    nome = x['nome']
+	    partido = x['partido']
+	    diplomacao = x['diplomacao']
+            estado = x['UF']
+            
+	    print >>sys.stderr, "Indexando politico '%s':" %(nome)
 
-    writer.addDocument(doc)
-
-
+            doc.add(Field("command", command, StringField.TYPE_STORED))
+            doc.add(Field("section", section, StringField.TYPE_STORED))
+            doc.add(Field("name", name.strip(), TextField.TYPE_STORED))
+    
+            doc.add(Field("estado", estado, TextField.TYPE_STORED))    
+            doc.add(Field("nome", nome, TextField.TYPE_STORED))
+            doc.add(Field("partido", partido, TextField.TYPE_STORED))
+            doc.add(Field("diplomacao", diplomacao, TextField.TYPE_STORED))
+            doc.add(Field("arquivo", filename.strip(), StringField.TYPE_STORED))
+            doc.add(Field("filename", os.path.abspath(path), StringField.TYPE_STORED))
+	
+	    writer.addDocument(doc)
+        json_data.close()   
+        
 if __name__ == '__main__':
 
     if len(sys.argv) != 2:
@@ -92,7 +108,7 @@ if __name__ == '__main__':
         config = IndexWriterConfig(Version.LUCENE_CURRENT, analyzer)
         writer = IndexWriter(directory, config)
 
-        manpath = os.environ.get('MANPATH', '/usr/share/man').split(os.pathsep)
+        manpath = os.environ.get('MANPATH', '/home/anna/Downloads/OGRI').split(os.pathsep)
         for dir in manpath:
             print "Crawling", dir
             for name in os.listdir(dir):
@@ -101,3 +117,4 @@ if __name__ == '__main__':
                     indexDirectory(path)
         writer.commit()
         writer.close()
+

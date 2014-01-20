@@ -2,13 +2,14 @@
 # PoliticoSpyder
 
 import re
+import unicodedata
+
+import nltk
+from nltk.corpus import stopwords
 
 from scrapy.spider import BaseSpider
 from scrapy.selector import Selector
 from scrapy.http import FormRequest
-
-import nltk
-from nltk.corpus import stopwords
 
 from politico.items import PoliticoItem
 
@@ -28,7 +29,7 @@ class PoliticoSpyder(BaseSpider):
         form = sel.xpath('//*[@id="formDepAtual"]')
         deputados = form.xpath('//select[@id="deputado"]/option')
 
-        for deputado in deputados[0:10]:
+        for deputado in deputados:
             yield FormRequest(
                 url=form.xpath('@action').extract()[0],
                 formdata={
@@ -51,7 +52,7 @@ class PoliticoSpyder(BaseSpider):
 
         print pol['nome']
 
-        pol['clean_nome'] = self.cleanup(pol['nome']);
+        pol['clean_nome'] = self.cleanup(unicode(pol['nome']));
 
         pol['aniversario'] = self.format(sel.xpath(
             '//*[@id="content"]//ul[@class="visualNoMarker"]/li[2]/text()').extract()[0],
@@ -107,6 +108,18 @@ class PoliticoSpyder(BaseSpider):
         return re.findall(format, data)
 
     def cleanup(self, text):
+        """
+        Função de preprocessamento de texto. Remove os acentos e palavras
+        não muito importantes.
+
+        :param text: text a ser manipulado;
+        """
+
+        try:
+            text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore')
+        except TypeError:
+            pass
+
         stopset = set(stopwords.words('portuguese'))
         tokens = nltk.word_tokenize(text)
 
