@@ -57,9 +57,9 @@ class Indexer
                     $doc = new Lucene\Document();
                     $doc->addField(Lucene\Document\Field::Text('url', $entry->url));
                     $doc->addField(Lucene\Document\Field::Text('title', $entry->title));
-                    $doc->addField(Lucene\Document\Field::Text('taxonomy', $entry->taxonomy));
+                    //$doc->addField(Lucene\Document\Field::Text('taxonomy', $entry->taxonomy));
                     $doc->addField(Lucene\Document\Field::Keyword('group', $this->classifier->classify($entry->title)));
-                    $doc->addField(Lucene\Document\Field::UnStored('text', $entry->text));
+                    $doc->addField(Lucene\Document\Field::Text('text', $entry->text));
                     $doc->addField(Lucene\Document\Field::UnIndexed('datetime', $entry->datetime));
 
                     // Adiciona documento ao index

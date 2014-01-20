@@ -27,29 +27,31 @@ class Search {
 
         // prepara a query
         $title_query = "title:($query)";
+        $text_query = "text:($query)";
         $localization_query = "localization:($query)";
         $group_query = "group:($query)";
-        $taxonomy_query = "taxonomy:($query)";
+        //$taxonomy_query = "taxonomy:($query)";
 
         // Monta a query
-        $fullQuery = Lucene\Search\QueryParser::parse("$title_query $taxonomy_query $group_query $localization_query");
+        $fullQuery = Lucene\Search\QueryParser::parse("$title_query $text_query $group_query $localization_query");
         // Faz a busca
         $hits = $index->find($query); // Executa query
 
         // Lista resultados
+        $results = array();
         foreach ($hits as $hit) {
             $document = $hit->getDocument();
 
-            echo "Title: " . $document->getFieldValue('title') . "\n";
-            echo "Url: " . $document->getFieldValue('url') . "\n";
-            echo "Group: " . $document->getFieldValue('group') . "\n\n";
+            $result = array(
+                'url' => $document->getFieldValue('url'),
+                'title' => $document->getFieldValue('title'),
+                'text' => $document->getFieldValue('text'),
+                'group' => $document->getFieldValue('group'),
+            );
+
+            $results[] = $result;
         }
 
-        echo "Total: " . count($hits) . "\n\n";
+        return $results;
     }
 }
-
-// instacia um buscador e faz uma busca
-$q = !empty($_GET['q']) ? $_GET['q'] : 'Vitoria';
-$sc = new Search();
-$sc->query($q);
