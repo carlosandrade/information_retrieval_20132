@@ -98,28 +98,32 @@ def indexFile(dir, filename):
         doc.add(Field("filename", os.path.abspath(path), StringField.TYPE_STORED))
         writer.addDocument(doc)
 
+def index():
+    """ Add ao caminho da biblioteca compartilhada da maquina virtual Java """
+    lucene.initVM(vmargs=['-Djava.awt.headless=true'])
+    
+    """ Pegando direitorio passado pelo parametro"""
+    directory = SimpleFSDirectory(File(sys.argv[1])) 
+    analyzer = StandardAnalyzer(Version.LUCENE_CURRENT)
+    analyzer = LimitTokenCountAnalyzer(analyzer, 10000)
+    config = IndexWriterConfig(Version.LUCENE_CURRENT, analyzer)
+    writer = IndexWriter(directory, config)
+    
+    manpath = os.environ.get('MANPATH', '/home/massilva/Documentos/Ogri/Doc/pt_BR/').split(os.pathsep)
+    for dir in manpath:
+        print "Crawling", dir
+        for name in os.listdir(dir):
+            path = os.path.join(dir, name)
+            if os.path.isdir(path):
+                indexDirectory(path)
+    writer.commit()
+    writer.close()
+
+    
 if __name__ == '__main__':
 
     if len(sys.argv) != 2:
         print "Usage: python manindex.py <index dir>"
 
     else:
-        """ Add ao caminho da biblioteca compartilhada da maquina virtual Java """
-        lucene.initVM(vmargs=['-Djava.awt.headless=true'])
-        
-        """ Pegando direitorio passado pelo parametro"""
-        directory = SimpleFSDirectory(File(sys.argv[1])) 
-        analyzer = StandardAnalyzer(Version.LUCENE_CURRENT)
-        analyzer = LimitTokenCountAnalyzer(analyzer, 10000)
-        config = IndexWriterConfig(Version.LUCENE_CURRENT, analyzer)
-        writer = IndexWriter(directory, config)
-
-        manpath = os.environ.get('MANPATH', '/home/massilva/Documentos/Ogri/Doc/pt_BR/').split(os.pathsep)
-        for dir in manpath:
-            print "Crawling", dir
-            for name in os.listdir(dir):
-                path = os.path.join(dir, name)
-                if os.path.isdir(path):
-                    indexDirectory(path)
-        writer.commit()
-        writer.close()
+        index()
