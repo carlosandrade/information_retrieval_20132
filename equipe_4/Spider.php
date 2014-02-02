@@ -53,7 +53,7 @@ class Spider {
         array(
             'name' => 'globoesporte',
             'baseUrl' => 'http://globoesporte.globo.com',
-            'paginationLimit' => 10,
+            'paginationLimit' => 2,
             'startPage' => 1,
             'list' => array(
                 'typeLink' => 'absolut',
@@ -64,12 +64,12 @@ class Spider {
                 'title' => '//div[@class="materia-titulo"]/h1',
                 'text' => '//div[@class="corpo-conteudo"]/p',
                 'datetime' => '//abbr[@class="published"]/time',
-            )
+            ),
         ),
         array(
             'name' => 'terra',
             'baseUrl' => 'http://esportes.terra.com.br',
-            'paginationLimit' => 10,
+            'paginationLimit' => 2,
             'startPage' => 1,
             'list' => array(
                 'typeLink' => 'absolut',
@@ -85,10 +85,10 @@ class Spider {
         array(
             'name' => 'lancenet',
             'baseUrl' => 'http://www.lancenet.com.br',
-            'paginationLimit' => 10,
+            'paginationLimit' => 2,
             'startPage' => 1,
             'list' => array(
-                'typeLink' => 'absolut',
+                'typeLink' => 'relative',
                 'endPoint' => '/futebol/?page={page}',
                 'filter' => '//div[@class="mt"]/a[1]',
             ),
@@ -162,8 +162,8 @@ class Spider {
 
             $this->list = array_merge($this->list, $list); // junta links das paginas
             $wait = rand(5, 10);
-            echo "Waiting {$wait} seconds...\n";
-            sleep($wait);
+             echo "Waiting {$wait} seconds...\n";
+            //sleep($wait);
         }
     }
 
@@ -207,7 +207,12 @@ class Spider {
                     //$str = strip_tags($crawler->filterXPath($filter)->text());
                     $strProccess = preg_replace($this->stop_words, "", $str);
                     $data['taxonomy'] = $this->stem($strProccess, $data['taxonomy']);
-                    $data[$key] = $str;
+                    $data[$key] = $this->callbacks($website['name'], $key, $str);
+
+                    if ($key == 'datetime') {
+                        echo "$str\n";
+                        echo "{$data[$key]}\n\n";
+                    }
                 } catch (Exception $e) {
                     $data[$key] = '';
                 }
@@ -217,7 +222,7 @@ class Spider {
             $this->result[$website['name']][] = $data;
             $wait = rand(5, 10);
             echo "Waiting {$wait} seconds...\n";
-            sleep($wait);
+            //sleep($wait);
         }
     }
 
@@ -263,9 +268,61 @@ class Spider {
 
         return implode(' ', $tax);
     }
+
+    public function callbacks($website, $key, $value)
+    {
+        $callbacks = array(
+            'globoesporte' => array(
+                'datetime' => function($str) {
+                    $pieces = explode("/", explode(" ", $str)[0]);
+
+                    return implode("", array_reverse($pieces));
+                },
+            ),
+            'lancenet' => array(
+                'datetime' => function($str) {
+                    $pieces = explode("/", explode(" ", $str)[0]);
+
+                    return implode("", array_reverse($pieces));
+                },
+            ),
+            'terra' => array(
+                'datetime' => function($str) {
+                    $pieces = explode(" ", $str);
+
+                    $month = array(
+                        'Janeiro' => '01',
+                        'Fevereiro' => '02',
+                        'Março' => '03',
+                        'abril' => '04',
+                        'Maio' => '05',
+                        'Junho' => '06',
+                        'Julho' => '07',
+                        'Agosto' => '08',
+                        'Setembro' => '09',
+                        'Outubro' => '10',
+                        'Novembro' => '11',
+                        'Dezembro' => '12',
+                    );
+
+                    return $pieces[4] . $month[$pieces[2]] . $pieces[0];
+                },
+            )
+        );
+
+        if (!empty($callbacks[$website][$key])) {
+            return $callbacks[$website][$key]($value);
+        }
+
+        return $value;
+    }
 }
 
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 // Roda o spider
+echo "Start\n";
 $sp = new Spider();
 $sp->run();
 $sp->save();
+echo "End\n";
