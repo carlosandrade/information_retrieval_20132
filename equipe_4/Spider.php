@@ -162,8 +162,8 @@ class Spider {
 
             $this->list = array_merge($this->list, $list); // junta links das paginas
             $wait = rand(5, 10);
-             echo "Waiting {$wait} seconds...\n";
-            //sleep($wait);
+            echo "Waiting {$wait} seconds...\n";
+            sleep($wait);
         }
     }
 
@@ -222,7 +222,7 @@ class Spider {
             $this->result[$website['name']][] = $data;
             $wait = rand(5, 10);
             echo "Waiting {$wait} seconds...\n";
-            //sleep($wait);
+            sleep($wait);
         }
     }
 
