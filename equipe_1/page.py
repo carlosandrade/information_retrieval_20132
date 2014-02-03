@@ -16,7 +16,7 @@ def index():
     return render_template('index.html')
 
 def content(doc_id = None):
-    pass#result = 
+    pass
 
 def search():
     pass

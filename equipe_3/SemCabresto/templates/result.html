@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <h2>Resultado</h2>
+  
+  {% for result in resultados %}
+    {{result.nome}}
+  {% endfor %}
+
+{% endblock %}

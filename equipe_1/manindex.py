@@ -98,7 +98,7 @@ def indexFile(dir, filename):
         doc.add(Field("filename", os.path.abspath(path), StringField.TYPE_STORED))
         writer.addDocument(doc)
 
-def index():
+def indexContent():
     """ Add ao caminho da biblioteca compartilhada da maquina virtual Java """
     lucene.initVM(vmargs=['-Djava.awt.headless=true'])
     
@@ -126,4 +126,4 @@ if __name__ == '__main__':
         print "Usage: python manindex.py <index dir>"
 
     else:
-        index()
+        indexContent()
