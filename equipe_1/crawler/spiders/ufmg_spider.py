@@ -1,8 +1,6 @@
-import nltk
 from scrapy.spider import BaseSpider
 from scrapy.selector import Selector
 from crawler.items import IesItem
-from nltk.corpus import stopwords
 
 class UfmgSpider(BaseSpider):
   name = "ufmg"
@@ -20,8 +18,7 @@ class UfmgSpider(BaseSpider):
     for person in teachers:
       item = IesItem()
       item['nome'] = person.xpath('tr/td/table/tr[1]/td[2]/strong/text()').extract()
-      #item['cleanNome'] = self.cleanup(''.join(item['nome']))
-
+      
       a = str(person.xpath('tr/td/table/tr[1]/td[2]/text()').extract())
       a = a.replace(' .','').replace('.','').replace('"','')
       begin = a.find(')')
