@@ -14,3 +14,5 @@ class PoliticoItem(Item):
     diplomacao = Field()
     telefone = Field()
     legislaturas = Field()
+    email = Field()
+    biografia = Field()

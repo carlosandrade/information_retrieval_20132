@@ -7,7 +7,7 @@
 #
 
 BOT_NAME = 'politico'
-
+USER_AGENT = 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36'
 SPIDER_MODULES = ['politico.spiders']
 NEWSPIDER_MODULE = 'politico.spiders'
 
