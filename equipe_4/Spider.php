@@ -53,7 +53,7 @@ class Spider {
         array(
             'name' => 'globoesporte',
             'baseUrl' => 'http://globoesporte.globo.com',
-            'paginationLimit' => 2,
+            'paginationLimit' => 100,
             'startPage' => 1,
             'list' => array(
                 'typeLink' => 'absolut',
@@ -69,7 +69,7 @@ class Spider {
         array(
             'name' => 'terra',
             'baseUrl' => 'http://esportes.terra.com.br',
-            'paginationLimit' => 2,
+            'paginationLimit' => 100,
             'startPage' => 1,
             'list' => array(
                 'typeLink' => 'absolut',
@@ -85,7 +85,7 @@ class Spider {
         array(
             'name' => 'lancenet',
             'baseUrl' => 'http://www.lancenet.com.br',
-            'paginationLimit' => 2,
+            'paginationLimit' => 100,
             'startPage' => 1,
             'list' => array(
                 'typeLink' => 'relative',
@@ -180,7 +180,9 @@ class Spider {
 
             // Monta url
             if ($website['list']['typeLink'] == 'relative') {
-                $url = $website['baseUrl'] . $list;
+                if (!strpos($list, "http")) {
+                    $url = $website['baseUrl'] . "/" . $list;
+                }
             }
 
             echo "Get data from page {$url}\n";
