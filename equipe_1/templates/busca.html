@@ -1,0 +1,34 @@
+{% extends "bootstrap/base.html" %}
+{% block title %} Resultado Busca pós{% endblock %}
+
+{% block navbar %}
+<div class="navbar navbar-fixed-top">
+</div>
+{% endblock %}
+
+{% block styles %}
+{{super()}}
+{% endblock %}
+
+{% block content %}
+  <table border="1" class="table">
+    <tr>
+      <td>Nota Mestrado Profissional</td>
+      <td>Nota Mestrado</td>
+      <td>Nota Doutorado</td>
+      <td>Universidade</td>
+      <td>UF</td>
+    </tr>
+  {% for t in table %}
+    <tr>
+      <td>{{ t['f'] }}</td>
+      <td>{{ t['m'] }}</td>
+      <td>{{ t['d'] }}</td>
+      <td>{{ t['ies'] }}</td>
+      <td>{{ t['uf'] }}</td>
+    </tr>  
+  {% endfor %}
+  </table>
+</div>
+
+{% endblock %}

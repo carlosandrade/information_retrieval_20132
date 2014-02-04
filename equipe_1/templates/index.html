@@ -11,10 +11,10 @@
 {% endblock %}
 
 {% block content %}
-  <h1>Bem vindo ao busca pós!</h1>
+  <h1>Bem vindo ao busca Pós!</h1>
 
 
-  <form class="form-inline" role="form">
+  <form class="form-inline" role="form" action="search/">
     <div class="submit">
       <label for="universidade">Nome da Universidade ou sigla</label>
       <input type="name" class="form-control" id="universidade" placeholder="Universidade">
@@ -32,22 +32,13 @@
         <div class="collapse" id="advancedForm">
           <p>
           <label for="conceitoCapes">Conceito Capes <label>
-          <select class="form-control">
+          <select class="form-control" name="conceito">
             <option>3</option>
             <option>4</option>
             <option>5</option>
             <option>6</option>
             <option>7</option>
           </select>
-          </p>
-          <label for="regiao">Região </label>
-          <select class="form-control">
-            <option>Centro-Oeste</option>
-            <option>Nordeste</option>
-            <option>Norte</option>
-            <option>Sudeste</option>
-            <option>Sul</option>
-          </select><p></p>
         </div>
 
         <button type="submit" class="btn btn-default">Pesquisar</button>

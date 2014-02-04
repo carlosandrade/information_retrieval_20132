@@ -30,16 +30,14 @@ from org.apache.lucene.document import Document, Field, StringField, TextField
 from org.apache.lucene.store import SimpleFSDirectory
 from org.apache.lucene.util import Version
 
-def indexDirectory(dir):
-
+def indexDirectory(dir,writer):
     for name in os.listdir(dir):
         path = os.path.join(dir, name)
         if os.path.isfile(path):
-            indexFile(dir, name)
+            indexFile(dir, name,writer)
 
 
-def indexFile(dir, filename):
-
+def indexFile(dir, filename, writer):
     path = os.path.join(dir, filename)
     print "\tArquivo: ", filename
 
@@ -98,32 +96,23 @@ def indexFile(dir, filename):
         doc.add(Field("filename", os.path.abspath(path), StringField.TYPE_STORED))
         writer.addDocument(doc)
 
-def indexContent():
-    """ Add ao caminho da biblioteca compartilhada da maquina virtual Java """
+def indexContent(indexDir):
     lucene.initVM(vmargs=['-Djava.awt.headless=true'])
     
     """ Pegando direitorio passado pelo parametro"""
-    directory = SimpleFSDirectory(File(sys.argv[1])) 
+    directory = SimpleFSDirectory(File(indexDir)) 
     analyzer = StandardAnalyzer(Version.LUCENE_CURRENT)
     analyzer = LimitTokenCountAnalyzer(analyzer, 10000)
     config = IndexWriterConfig(Version.LUCENE_CURRENT, analyzer)
     writer = IndexWriter(directory, config)
     
-    manpath = os.environ.get('MANPATH', '/home/massilva/Documentos/Ogri/Doc/pt_BR/').split(os.pathsep)
+    manpath = os.environ.get('MANPATH', '/home/massilva/Documentos/Ogri/Codigo/information_retrieval_20132/equipe_1/jsons/').split(os.pathsep)
+
     for dir in manpath:
         print "Crawling", dir
         for name in os.listdir(dir):
             path = os.path.join(dir, name)
             if os.path.isdir(path):
-                indexDirectory(path)
+                indexDirectory(path,writer)
     writer.commit()
     writer.close()
-
-    
-if __name__ == '__main__':
-
-    if len(sys.argv) != 2:
-        print "Usage: python manindex.py <index dir>"
-
-    else:
-        indexContent()

@@ -36,24 +36,88 @@ from org.apache.lucene.search import IndexSearcher
 from org.apache.lucene.store import SimpleFSDirectory
 from org.apache.lucene.util import Version
 
-if __name__ == '__main__':
+def buscar(indexDir, args):
     lucene.initVM(vmargs=['-Djava.awt.headless=true'])
+    
+    fsDir = SimpleFSDirectory(File(indexDir))
+    #print fsDir
+    
+    #Criando buscador baseado no diretorio dos indices passados pelo usuario
+    searcher = IndexSearcher(DirectoryReader.open(fsDir))
+    
+    #Analizador para filtro dos tokens 
+    analyzer = StandardAnalyzer(Version.LUCENE_CURRENT)
+    #print analyzer
+
+    #Criando um QueryParser usando por padrao contents
+    #Variavel com as restricoes da busca
+    parser = QueryParser(Version.LUCENE_CURRENT, "keywords", analyzer)
+    #print parser
+
+    parser.setDefaultOperator(QueryParser.Operator.AND)
+
+    #Juntando parametros passados com o valor do mesmo
+    command = ' '.join(args)
+    #print command
+
+    query = parser.parse(command)
+    #print query
+
+    #Criando um JArray com resultado da consulta
+    return searcher.search(query, 200).scoreDocs
+    #print scoreDocs
+
+def printDoc(indexDir,scoreDocs,args,stats,duration):
+    
+    """
+    formato: IES , Nota Doutorado , Nota Mestrado , UF , Nota mestrado Profissional , Programa 
+    """
+    format =" #ies , #d , #m , #uf , #f , #program "
+    #print indexDir
+
+    class CustomTemplate(Template):
+        delimiter = '#'
+
+    template = CustomTemplate(format)
+    
+    fsDir = SimpleFSDirectory(File(indexDir))
+    #print fsDir
+    
+    #Criando buscador baseado no diretorio dos indices passados pelo usuario
+    searcher = IndexSearcher(DirectoryReader.open(fsDir))
+    
+    #imprimindo a quantidade e os documentos que tem a consulta feita
+    if stats:
+
+        #Juntando parametros passados com o valor do mesmo
+        command = ' '.join(args)
+        #print command
+
+        print >>sys.stderr, "Encontrado %d documento(s) (em %s) com consulta igual a '%s':" %(len(scoreDocs), duration,command)
+
+    newTable = []
+
+    for scoreDoc in scoreDocs:
+        doc = searcher.doc(scoreDoc.doc)
+        table = dict((field.name(), field.stringValue()) for field in doc.getFields())
+        newTable.append(template.substitute(table).split(","))
+
+    if newTable :
+        headers = [" IES "," Nota Doutorado "," Nota Mestrado "," UF "," Nota mestrado Profissional "," Programa "]
+        print tabulate(newTable,headers,tablefmt="grid")
 
 def usage():
     print sys.argv[0], "[--format=<format string>] [--index=<index dir>] [--stats] <query...>"
     print "default index is found from MANDEX environment variable"
 
+
+"""
 try:
     options, args = getopt(sys.argv[1:], '', ['format=', 'index=', 'stats'])
 except GetoptError:
     usage()
     sys.exit(2)
 
-
-"""
-formato: IES , Nota Doutorado , Nota Mestrado , UF , Nota mestrado Profissional , Programa 
-"""
-format =" #ies , #d , #m , #uf , #f , #program "
 #Pegando o diretorio onde estao os indices pela variavel de ambiente MANDEX ou por padrao serah pages/
 indexDir = os.environ.get('MANDEX') or 'pages/'
 
@@ -66,57 +130,11 @@ for o, a in options:
         indexDir = a
     elif o == "--stats":
         stats = True
-#print indexDir
 
-class CustomTemplate(Template):
-    delimiter = '#'
-
-template = CustomTemplate(format)
-
-fsDir = SimpleFSDirectory(File(indexDir))
-#print fsDir
-
-#Criando buscador baseado no diretorio dos indices passados pelo usuario
-searcher = IndexSearcher(DirectoryReader.open(fsDir))
-#print searcher
-
-#Analizador para filtro dos tokens 
-analyzer = StandardAnalyzer(Version.LUCENE_CURRENT)
-#print analyzer
-
-#Criando um QueryParser usando por padrao contents
-#Variavel com as restricoes da busca
-parser = QueryParser(Version.LUCENE_CURRENT, "keywords", analyzer)
-#print parser
-
-parser.setDefaultOperator(QueryParser.Operator.AND)
-
-#Juntando parametros passados com o valor do mesmo
-command = ' '.join(args)
-#print command
-
-query = parser.parse(command)
-#print query
 
 #Horario atual
 start = datetime.now()
-
-#Criando um JArray com resultado da consulta
-scoreDocs = searcher.search(query, 200).scoreDocs
-#print scoreDocs
-
+scoreDocs = buscar(indexDir, args, options)
 duration = datetime.now() - start
-#imprimindo a quantidade e os documentos que tem a consulta feita
-if stats:
-    print >>sys.stderr, "Encontrado %d documento(s) (em %s) que tem consulta igual a '%s':" %(len(scoreDocs), duration, query)
-
-newTable = []
-
-for scoreDoc in scoreDocs:
-    doc = searcher.doc(scoreDoc.doc)
-    table = dict((field.name(), field.stringValue()) for field in doc.getFields())
-    newTable.append(template.substitute(table).split(","))
-
-if newTable :
-    headers = [" IES "," Nota Doutorado "," Nota Mestrado "," UF "," Nota mestrado Profissional "," Programa "]
-    print tabulate(newTable,headers,tablefmt="grid")
+printDoc(indexDir,scoreDocs, args, stats,duration)
+"""
