@@ -50,7 +50,7 @@ except GetoptError:
 
 
 format = "#name"
-indexDir = os.environ.get('MANDEX') or 'Iteracao2Index'
+indexDir = os.environ.get('MANDEX') or '3iteracao'
 stats = False
 field = 'partido'
 for o, a in options:
@@ -86,6 +86,7 @@ for scoreDoc in scoreDocs:
                  for field in doc.getFields())
    
     print "Politico: '%s'" %table['nome']
+    print "Quem?: '%s'" %table['biografia']
     print "arquivo: '%s'" %table['arquivo']
     print template.substitute(table)
 

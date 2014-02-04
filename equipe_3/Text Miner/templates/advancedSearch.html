@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <h2>Pesquisa Avançada</h2>
+
+  {% for message in form.firstname.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+  
+  {% for message in form.lastname.errors %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+
+ 	<form class="form-inline" role="form">
+
+ 	<div class="container-fluid">  
+    	    <label>Nome:</label> 
+                <input type='text' name='nome' placeholder="nome"
+                value='{{nome}}' >
+
+            <label>Estado:</label> 
+            <select name="estado">
+		        <option value="">Estado</option>
+		        <option value="AC">AC</option>
+		        <option value="AM">AM</option>
+				<option value="BA">BA</option>
+		        <option value="BR">BR</option>
+		        <option value="CE">CE</option>
+		        <option value="GO">GO</option>
+		        <option value="MA">MA</option>
+		        <option value="MG">MG</option>
+		        <option value="MS">MS</option>
+				<option value="MT">MT</option>
+		        <option value="PA">PA</option>
+		        <option value="PE">PE</option>
+		        <option value="SC">SC</option>
+		        <option value="SP">SP</option>
+		        <option value="RJ">RJ</option>
+           </select>
+
+            <label>Partido:</label> 
+            <select name="cargo">
+                <option value="">Partido</option>
+                <option value="PDT">PDT</option>
+                <option value="PSC">PSC</option>
+                <option value="PROS">PROS</option>
+                <option value="PSDB">PSDB</option>
+                <option value="PMDB">PMDB</option>
+                <option value="PP ">PP</option>
+             	<option value="PSD">PSD"</option>
+             	<option value="PT">PT</option>
+         	</select>
+            <label>Cargo:</label> 
+            <select name="cargo">
+                <option value="">Cargo</option>
+                <option value="Titular">Titular</option>
+                <option value="Suplente">Suplente</option>
+            </select><br><br>
+        </div>
+
+       		<input type="button" class="btn" value="Voltar">
+       		<button type="submit" class="btn btn-default">Pesquisar</button>
+	</form>
+
+    
+{% endblock %}

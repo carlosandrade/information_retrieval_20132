@@ -1,23 +1,3 @@
-# ====================================================================
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-# ====================================================================
-#
-# Author: Erik Hatcher
-#
-# to index all man pages on $MANPATH or /usr/share/man:
-#   python manindex.py pages
-# ====================================================================
-
 import os, re, sys, lucene
 from subprocess import *
 import json
@@ -78,20 +58,22 @@ def indexFile(dir, filename):
 	    partido = x['partido']
 	    diplomacao = x['diplomacao']
             estado = x['UF']
+	    biografia = x['biografia']
             
 	    print >>sys.stderr, "Indexando politico '%s':" %(nome)
 
             doc.add(Field("command", command, StringField.TYPE_STORED))
             doc.add(Field("section", section, StringField.TYPE_STORED))
             doc.add(Field("name", name.strip(), TextField.TYPE_STORED))
-    
+
+            doc.add(Field("biografia", biografia, TextField.TYPE_STORED))    
             doc.add(Field("estado", estado, TextField.TYPE_STORED))    
             doc.add(Field("nome", nome, TextField.TYPE_STORED))
             doc.add(Field("partido", partido, TextField.TYPE_STORED))
             doc.add(Field("diplomacao", diplomacao, TextField.TYPE_STORED))
             doc.add(Field("arquivo", filename.strip(), StringField.TYPE_STORED))
             doc.add(Field("filename", os.path.abspath(path), StringField.TYPE_STORED))
-	
+	    print biografia
 	    writer.addDocument(doc)
         json_data.close()   
         

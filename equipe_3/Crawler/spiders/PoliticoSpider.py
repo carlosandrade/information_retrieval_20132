@@ -32,7 +32,7 @@ class PoliticoSpyder(BaseSpider):
         form = sel.xpath('//*[@id="formDepAtual"]')
         deputados = form.xpath('//select[@id="deputado"]/option')[1:-1]
 
-        for deputado in deputados[0:50]:
+        for deputado in deputados[0:5]:
         #deputado = deputados[0]
             yield FormRequest(
                 url=form.xpath('@action').extract()[0],
@@ -52,16 +52,19 @@ class PoliticoSpyder(BaseSpider):
         sel = Selector(response)
         pol = PoliticoItem()
 
-        pol['nome'] = sel.xpath(
-            '//*[@id="content"]//ul[@class="visualNoMarker"]/li[1]/text()').extract()[0]
+        print "dados de " + response.meta['nome']
 
-        print "dados de " + pol['nome']
+        pol['apelido'] = response.meta['nome']
 
-        pol['clean_nome'] = self.cleanup(unicode(pol['nome']));
+        pol['nome'] = self.format(sel.xpath(
+            '//*[@id="content"]//ul[@class="visualNoMarker"]/li[1]/text()').extract()[0],
+            r" (.*)", 1)
+
+        pol['clean_nome'] = self.cleanup(unicode(pol['nome'] + " " + pol['apelido']));
 
         pol['aniversario'] = self.format(sel.xpath(
             '//*[@id="content"]//ul[@class="visualNoMarker"]/li[2]/text()').extract()[0],
-            r"(\d*) / (\d*) .*", "\\1/\\2")
+            r" (\d*) / (\d*) .*", "\\1/\\2")
 
         pol['partido'] = self.format(sel.xpath(
             '//*[@id="content"]//ul[@class="visualNoMarker"]/li[3]/text()').extract()[0],
@@ -77,14 +80,14 @@ class PoliticoSpyder(BaseSpider):
 
         pol['telefone'] = self.format(sel.xpath(
             '//*[@id="content"]//ul[@class="visualNoMarker"]/li[4]/text()').extract()[0],
-            r"( \(\d*?\)) ([\d-]*) .*", "\\1 \\2")
+            r" (\(\d*?\)) ([\d-]*) .*", "\\1 \\2")
 
         pol['legislaturas'] = self.find(sel.xpath(
             '//*[@id="content"]//ul[@class="visualNoMarker"]/li[5]/text()').extract()[0],
             r"\d{2}/\d{2}")
 
         #pegando email
- 
+
         try:
             email = sel.xpath('//*[@id="content"]/div/div[3]/ul/li[4]/a/text()').extract()[0]
             pol['email'] = email if(re.search('@', email)) else ""
@@ -102,15 +105,18 @@ class PoliticoSpyder(BaseSpider):
         #return pol
 
     def save_biografia(self, response):
+        """
+        Retorno do site de Pesquisa do Google, verifica se ha uma biografia associada a pesquisa
+        """
+
         sel = Selector(response)
         pol = response.meta['politico']
 
         try:
-            pol['biografia'] = "\n".join(
-                sel.xpath('//*[@id="kno-result"]/div/ol/div[1]/div[1]/div[4]/li/div/div[1]/span[1]/text()').extract()
-            )
+            bio = sel.xpath('//*[@id="kno-result"]/div/ol/div[1]/div[1]/div[4]/li/div/div[1]/span[1]/text()').extract()
+            pol['biografia'] = "\n".join(bio) if bio else "Sem detalhes sobre esse deputado..."
         except Exception, e:
-            pol['biografia'] = "Sem detalhes sobre esse politico..."
+            pol['biografia'] = "Sem detalhes sobre esse deputado..."
             pass
 
         return pol
@@ -161,5 +167,7 @@ class PoliticoSpyder(BaseSpider):
         clean = [
             token for token in tokens if not token in stopset and len(token) > 2
         ]
+
+        clean = list(set(clean))
 
         return clean
