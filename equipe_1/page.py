@@ -3,9 +3,9 @@
 
 from flask import Flask
 from flask import render_template
-from flask_bootstrap import Bootstrap
+from pip import *
+import mansearch 
 import manindex
-import mansearch
 import setting
 from java.io import File
 from org.apache.lucene.analysis.standard import StandardAnalyzer

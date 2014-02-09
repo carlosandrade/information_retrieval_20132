@@ -26,7 +26,7 @@ import sys, os, lucene
 from string import Template
 from datetime import datetime
 from getopt import getopt, GetoptError
-from tabulate import tabulate
+# from pip import liberate
 
 from java.io import File
 from org.apache.lucene.analysis.standard import StandardAnalyzer
@@ -36,7 +36,7 @@ from org.apache.lucene.search import IndexSearcher
 from org.apache.lucene.store import SimpleFSDirectory
 from org.apache.lucene.util import Version
 
-def buscar(indexDir, args):
+def buscar(indexDir, args,options = None):
     lucene.initVM(vmargs=['-Djava.awt.headless=true'])
     
     fsDir = SimpleFSDirectory(File(indexDir))
@@ -72,7 +72,7 @@ def printDoc(indexDir,scoreDocs,args,stats,duration):
     """
     formato: IES , Nota Doutorado , Nota Mestrado , UF , Nota mestrado Profissional , Programa 
     """
-    format =" #ies , #d , #m , #uf , #f , #program "
+    format =" #ies , #d , #m , #uf , #f , #program , #professor "
     #print indexDir
 
     class CustomTemplate(Template):
@@ -103,15 +103,13 @@ def printDoc(indexDir,scoreDocs,args,stats,duration):
         newTable.append(template.substitute(table).split(","))
 
     if newTable :
-        headers = [" IES "," Nota Doutorado "," Nota Mestrado "," UF "," Nota mestrado Profissional "," Programa "]
+        headers = ["IES"," Nota Doutorado", " Nota Mestrado "," UF "," Nota mestrado Profissional "," Programa ","Professor"]
         print tabulate(newTable,headers,tablefmt="grid")
 
 def usage():
     print sys.argv[0], "[--format=<format string>] [--index=<index dir>] [--stats] <query...>"
     print "default index is found from MANDEX environment variable"
 
-
-"""
 try:
     options, args = getopt(sys.argv[1:], '', ['format=', 'index=', 'stats'])
 except GetoptError:
@@ -119,7 +117,7 @@ except GetoptError:
     sys.exit(2)
 
 #Pegando o diretorio onde estao os indices pela variavel de ambiente MANDEX ou por padrao serah pages/
-indexDir = os.environ.get('MANDEX') or 'pages/'
+indexDir = os.environ.get('MANDEX') or 'indexer/'
 
 #Verificando as opcoes passado pelo usuario --format > formato da string --index > diretorio do indices --stats status da consulta
 stats = False
@@ -137,4 +135,3 @@ start = datetime.now()
 scoreDocs = buscar(indexDir, args, options)
 duration = datetime.now() - start
 printDoc(indexDir,scoreDocs, args, stats,duration)
-"""

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from scrapy.spider import BaseSpider
 from scrapy.selector import Selector
 from crawler.items import IesItem
@@ -19,16 +21,15 @@ class UfmgSpider(BaseSpider):
       item = IesItem()
       item['nome'] = person.xpath('tr/td/table/tr[1]/td[2]/strong/text()').extract()
       
-      a = str(person.xpath('tr/td/table/tr[1]/td[2]/text()').extract())
-      a = a.replace(' .','').replace('.','').replace('"','')
+      a = person.xpath('tr/td/table/tr[1]/td[2]/text()').extract()
+      a = a[1].replace(', ',',').replace(' .','').replace('.','').replace('"','')
       begin = a.find(')')
 
       if begin == -1:
         a = a.replace('-', ')')
         begin = a.find(')') 
       
-      begin += 2        
+      begin += 2
       
-      item['area'] = a[begin:]     
-
+      item['area'] = a[begin:].split(',')
       yield item
