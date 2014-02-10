@@ -56,12 +56,13 @@ def buscar(indexDir, args,options = None):
 
     parser.setDefaultOperator(QueryParser.Operator.AND)
 
+    #print args
     #Juntando parametros passados com o valor do mesmo
-    command = ' '.join(args)
+    command = ' +'.join(args)
     #print command
 
     query = parser.parse(command)
-    #print query
+    print query
 
     #Criando um JArray com resultado da consulta
     return searcher.search(query, 200).scoreDocs
@@ -135,3 +136,4 @@ start = datetime.now()
 scoreDocs = buscar(indexDir, args, options)
 duration = datetime.now() - start
 printDoc(indexDir,scoreDocs, args, stats,duration)
+"""

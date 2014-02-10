@@ -6,6 +6,7 @@ from flask import render_template
 from flask import request
 from flask_bootstrap import Bootstrap
 import manindex
+import mansearch
 import setting
 from java.io import File
 from org.apache.lucene.analysis.standard import StandardAnalyzer
@@ -36,13 +37,17 @@ def search():
 	args = []
 	if request.method == 'POST':
 		if request.form['ies']:
-			args.append('ies:'+request.form['ies'])
+			args.append('+ies:'+request.form['ies'])
 		if request.form['area']:
-			args.append('area:'+request.form['area'])
+			args.append('+area:'+request.form['area'])
 		if request.form['professor']:
-			args.append('professor:'+request.form['professor'])
+			args.append('+professor:'+request.form['professor'])
 		if request.form['conceito']:
-			args.append('m:'+request.form['conceito']+" OR d:"+request.form['conceito']+" OR f:"+request.form['conceito'])
+			#args.append('m:'+request.form['conceito']+'d:'+request.form['conceito']+'f:'+request.form['conceito'])
+			args.append('m:'+request.form['conceito'])
+			args.append('d:'+request.form['conceito'])
+			args.append('f:'+request.form['conceito'])
+
 	table = []
 	if(len(args) > 0): 
 		scoreDocs = mansearch.buscar('indexer/',args)
