@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sem Cabresto</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  </head>
+  <body>
+
+  <header>
+    <div class="container">
+      <h1 class="logo">Sem Cabresto</h1>
+      <nav>
+        <ul class="menu">
+          <li><a href="{{ url_for('search') }}">Pesquisa</a></li>
+          <li><a href="{{ url_for('advancedSearch') }}">Pesquisa avançada</a></li>
+          <li><a href="{{ url_for('about') }}">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+    <div class="container">
+      {% block content %}
+      {% endblock %}
+    </div>
+
+  </body>
+</html>

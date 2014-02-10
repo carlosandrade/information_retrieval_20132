@@ -10,6 +10,12 @@ BOT_NAME = 'crawler'
 
 SPIDER_MODULES = ['crawler.spiders']
 NEWSPIDER_MODULE = 'crawler.spiders'
+COOKIES_ENABLED = False
+DOWNLOAD_DELAY = 2
+ROBOTSTXT_OBEY = True
+
+ITEM_PIPELINES = { 'crawler.pipelines.CleanPipeline': 300, }
+				   # 'crawler.pipelines.RemoveAccentsPipeline': 100 ,}
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'tutorial (+http://www.yourdomain.com)'
+# USER_AGENT = 'tutorial (+http://www.yourdomain.com)'
