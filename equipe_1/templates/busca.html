@@ -1,38 +1,39 @@
 {% extends "bootstrap/base.html" %}
 {% block title %} Resultado Busca pós{% endblock %}
 
-{% block navbar %}
-<div class="navbar navbar-fixed-top">
-</div>
-{% endblock %}
-
 {% block styles %}
 {{super()}}
 {% endblock %}
 
 {% block content %}
-  <table border="1" class="table">
-    <tr>
-      <td>Nota Mestrado Profissional</td>
-      <td>Nota Mestrado</td>
-      <td>Nota Doutorado</td>
-      <td>Universidade</td>
-      <td>UF</td>
-      <td>Professor</td>
-      <td>Area</td>
-    </tr>
-  {% for t in table %}
-    <tr>
-      <td>{{ t['f'] }}</td>
-      <td>{{ t['m'] }}</td>
-      <td>{{ t['d'] }}</td>
-      <td>{{ t['ies'] }}</td>
-      <td>{{ t['uf'] }}</td>
-      <td>{{ t['professor'] }}</td>
-      <td>{{ t['area'] }}</td>
-    </tr>  
-  {% endfor %}
-  </table>
+<div class="container">
+  <h1>Resultado</h1>
+  {% if table %}
+    {% for t in table %}
+      <ul class="list-unstyled well">
+        <li class="">
+          <h2>{{ t['ies']   | capitalize()}} - {{ t['uf'] | upper}}</h2>
+        </li>
+          <li><span><strong>Conceitos:</strong></span></li>
+          <ul class="list-inline">
+            <li>F: {{ t['f'] }}</li>
+            <li>M: {{ t['m'] }}</li>
+            <li>D: {{ t['d'] }}</li>
+          </ul>
+          <li><span><strong>Professor: </strong></span>{{ t['professor'] }}</li>
+        <li><span><strong>Area: </strong></span>{{ t['area'] }}</li>
+    </ul>
+    {% endfor %}
+    <h3>Conceitos</h3>
+    <ul class="list-unstyled">
+      <li>F: Mestrado Profissional</li>
+      <li>M: Mestrado</li>
+      <li>D: Doutorado</li>
+    </ul>
+  {% else %}
+    <h6>A busca não obteve resultados.</h6>
+  {% endif %}
+  <input type='button' value='Voltar' class='btn' onClick='javascript:history.back(-1);'>
 </div>
 
 {% endblock %}

@@ -31,23 +31,23 @@ def content(doc_id = None):
 
 @app.route('/search/',methods = ['GET','POST'])
 def search():
-
-	lucene.initVM(vmargs=['-Djava.awt.headless=true'])
-    
 	args = []
 	if request.method == 'POST':
+		vm_env = lucene.getVMEnv()
+		if vm_env == None:
+			lucene.initVM(vmargs=['-Djava.awt.headless=true'])
 		if request.form['ies']:
-			args.append('+ies:'+request.form['ies'])
+			args.append('ies:'+request.form['ies'])
 		if request.form['area']:
-			args.append('+area:'+request.form['area'])
+			args.append('area:'+request.form['area'])
 		if request.form['professor']:
-			args.append('+professor:'+request.form['professor'])
+			args.append('professor:'+request.form['professor'])
+		if request.form['uf']:
+			args.append('uf:'+request.form['uf'])
 		if request.form['conceito']:
 			#args.append('m:'+request.form['conceito']+'d:'+request.form['conceito']+'f:'+request.form['conceito'])
 			args.append('m:'+request.form['conceito'])
 			args.append('d:'+request.form['conceito'])
-			args.append('f:'+request.form['conceito'])
-
 	table = []
 	if(len(args) > 0): 
 		scoreDocs = mansearch.buscar('indexer/',args)
