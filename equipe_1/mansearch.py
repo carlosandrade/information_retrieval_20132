@@ -37,7 +37,7 @@ from org.apache.lucene.store import SimpleFSDirectory
 from org.apache.lucene.util import Version
 
 def buscar(indexDir, args,options = None):
-    lucene.initVM(vmargs=['-Djava.awt.headless=true'])
+    #lucene.initVM(vmargs=['-Djava.awt.headless=true'])
     
     fsDir = SimpleFSDirectory(File(indexDir))
     #print fsDir

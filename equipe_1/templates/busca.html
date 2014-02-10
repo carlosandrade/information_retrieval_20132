@@ -18,6 +18,8 @@
       <td>Nota Doutorado</td>
       <td>Universidade</td>
       <td>UF</td>
+      <td>Professor</td>
+      <td>Area</td>
     </tr>
   {% for t in table %}
     <tr>
@@ -26,6 +28,8 @@
       <td>{{ t['d'] }}</td>
       <td>{{ t['ies'] }}</td>
       <td>{{ t['uf'] }}</td>
+      <td>{{ t['professor'] }}</td>
+      <td>{{ t['area'] }}</td>
     </tr>  
   {% endfor %}
   </table>

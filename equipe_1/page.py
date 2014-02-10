@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import sys, os, lucene
 from flask import Flask
 from flask import render_template
-from pip import *
-import mansearch 
+from flask import request
+from flask_bootstrap import Bootstrap
 import manindex
 import setting
 from java.io import File
@@ -22,35 +22,35 @@ indexDir = 'indexer'
 
 @app.route('/')
 def index():
-    # manindex.indexContent(indexDir)
+    #manindex.indexContent(indexDir)
     return render_template('index.html')
 
 def content(doc_id = None):
     pass
 
-@app.route('/search/?conceito=<int:conceito>')
-@app.route('/search/?universidade=<universidade>')
-@app.route('/search/?universidade=<universidade>&conceito=<int:conceito>')
-def search(universidade = None,conceito = None):
-	args = []
-	if universidade != None:
-		args.append('ies:'+universidade)
-	if conceito != None:
-		args.append('m:'+str(conceito))
-	
-	scoreDocs = mansearch.buscar('indexer/',args)
-	
-	fsDir = SimpleFSDirectory(File(indexDir))
-    #print fsDir
-    
-    #Criando buscador baseado no diretorio dos indices passados pelo usuario
-	searcher = IndexSearcher(DirectoryReader.open(fsDir))
-    
-	table = []
-	for scoreDoc in scoreDocs:
-		doc = searcher.doc(scoreDoc.doc)
-		table.append(dict((field.name(), field.stringValue()) for field in doc.getFields()))
+@app.route('/search/',methods = ['GET','POST'])
+def search():
 
+	lucene.initVM(vmargs=['-Djava.awt.headless=true'])
+    
+	args = []
+	if request.method == 'POST':
+		if request.form['ies']:
+			args.append('ies:'+request.form['ies'])
+		if request.form['area']:
+			args.append('area:'+request.form['area'])
+		if request.form['professor']:
+			args.append('professor:'+request.form['professor'])
+		if request.form['conceito']:
+			args.append('m:'+request.form['conceito']+" OR d:"+request.form['conceito']+" OR f:"+request.form['conceito'])
+	table = []
+	if(len(args) > 0): 
+		scoreDocs = mansearch.buscar('indexer/',args)
+		fsDir = SimpleFSDirectory(File(indexDir))
+		searcher = IndexSearcher(DirectoryReader.open(fsDir))
+		for scoreDoc in scoreDocs:
+			doc = searcher.doc(scoreDoc.doc)
+			table.append(dict((field.name(), field.stringValue()) for field in doc.getFields()))
 	return render_template('busca.html',table = table)
 	
 	pass

@@ -12,35 +12,32 @@
 
 {% block content %}
   <h1>Bem vindo ao busca Pós!</h1>
-
-
-  <form class="form-inline" role="form" action="search/">
+  <form class="form-inline" role="form" action="search/" method="POST">
     <div class="submit">
       <label for="universidade">Nome da Universidade ou sigla</label>
-      <input type="name" class="form-control" id="universidade" placeholder="Universidade">
+      <input type="name" name="ies" class="form-control" id="universidade" placeholder="Universidade">
     </div>
 
     <div class="submit">
       <label for="areaPesquisa">&Aacute;rea de pesquisa</label>
-      <input type="name" class="form-control" id="areaPesquisa" placeholder="&Aacute;rea de pesquisa">
+      <input type="name" name="area" class="form-control" id="areaPesquisa" placeholder="&Aacute;rea de pesquisa">
     </div>
     <label for="professor">Nome do professor</label>
-    <input type="name" class="form-control" id="professor" placeholder="Professor">
+    <input type="name" name="professor" class="form-control" id="professor" placeholder="Professor">
     
-    <p><div class="searchButtons">       
-
+    <p><div class="searchButtons">
         <div class="collapse" id="advancedForm">
           <p>
           <label for="conceitoCapes">Conceito Capes <label>
           <select class="form-control" name="conceito">
-            <option>3</option>
-            <option>4</option>
-            <option>5</option>
-            <option>6</option>
-            <option>7</option>
+            <option value="">.:Selecione:.</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
           </select>
         </div>
-
         <button type="submit" class="btn btn-default">Pesquisar</button>
         
         <button type="button" class="btn btn-default" data-toggle="collapse"
