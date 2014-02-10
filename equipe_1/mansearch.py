@@ -129,7 +129,7 @@ for o, a in options:
     elif o == "--stats":
         stats = True
 
-
+"""
 #Horario atual
 start = datetime.now()
 scoreDocs = buscar(indexDir, args, options)

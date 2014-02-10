@@ -22,7 +22,7 @@ indexDir = 'indexer'
 
 @app.route('/')
 def index():
-    manindex.indexContent(indexDir)
+    # manindex.indexContent(indexDir)
     return render_template('index.html')
 
 def content(doc_id = None):

@@ -30,15 +30,26 @@ from org.apache.lucene.document import Document, Field, StringField, TextField
 from org.apache.lucene.store import SimpleFSDirectory
 from org.apache.lucene.util import Version
  
+<<<<<<< HEAD
 def indexDirectory(dir):
+=======
+def indexDirectory(dir,writer):
+>>>>>>> 48816cc331d42091955b88de0d1a50fcb30458ae
  
     for name in os.listdir(dir):
         path = os.path.join(dir, name)
         if os.path.isfile(path):
+<<<<<<< HEAD
             indexFile(dir, name)
  
  
 def indexFile(dir, filename):
+=======
+            indexFile(dir, name,writer)
+ 
+ 
+def indexFile(dir, filename,writer):
+>>>>>>> 48816cc331d42091955b88de0d1a50fcb30458ae
  
     path = os.path.join(dir, filename)
     print "\tArquivo: ", filename
@@ -89,6 +100,7 @@ def indexFile(dir, filename):
         area = ""
         professor = ""
         cleanProfessor = ""
+<<<<<<< HEAD
 
         nomeArquivo = dir+"/../../ies/"+ies+".json"
         arquivo = os.path.join(dir,nomeArquivo)
@@ -150,3 +162,61 @@ if __name__ == '__main__':
                     indexDirectory(path)
         writer.commit()
         writer.close()
+=======
+
+        nomeArquivo = dir+"/../../ies/"+ies+".json"
+        arquivo = os.path.join(dir,nomeArquivo)
+        if os.path.exists(arquivo):
+            if ies not in fronteira:
+                print "\tArquivo: "+ies+".json"
+                arq = open(arquivo)
+                iesData = json.load(arq)
+                #print iesData
+                for inst in iesData:
+                    # print inst
+                    for p in inst["nome"]:
+                        professor = p.strip().lower()
+                        # print "PROF: "+professor
+                        for a in inst["area"]:
+                            area = a.strip().lower()
+                            # print area
+                            writer.addDocument(newDocument(d,m,f,ies,uf,program,path,professor,area))
+                fronteira.append(ies)
+        else:
+            writer.addDocument(newDocument(d,m,f,ies,uf,program,path,"",""))
+
+def newDocument(d,m,f,ies,uf,program,path,professor,area):
+    doc = Document()
+    doc.add(Field("d",d, StringField.TYPE_STORED))
+    doc.add(Field("m",m, StringField.TYPE_STORED))
+    doc.add(Field("f",f, StringField.TYPE_STORED))
+    doc.add(Field("ies",ies, StringField.TYPE_STORED))
+    doc.add(Field("uf",uf, StringField.TYPE_STORED))
+    doc.add(Field("program",program, TextField.TYPE_STORED))
+    doc.add(Field("filename", os.path.abspath(path), StringField.TYPE_STORED))
+    doc.add(Field("professor",professor, TextField.TYPE_STORED))
+    doc.add(Field("area",area, TextField.TYPE_STORED))
+    doc.add(Field("keywords", ' '.join((d, m, f, ies,uf,program,area,professor)),TextField.TYPE_NOT_STORED))
+    return doc
+
+def indexContent(indexDir):
+    lucene.initVM(vmargs=['-Djava.awt.headless=true'])
+    
+    """ Pegando direitorio passado pelo parametro"""
+    directory = SimpleFSDirectory(File(indexDir)) 
+    analyzer = StandardAnalyzer(Version.LUCENE_CURRENT)
+    analyzer = LimitTokenCountAnalyzer(analyzer, 10000)
+    config = IndexWriterConfig(Version.LUCENE_CURRENT, analyzer)
+    writer = IndexWriter(directory, config)
+    
+    manpath = os.environ.get('MANPATH', '/home/massilva/Documentos/Ogri/Codigo/information_retrieval_20132/equipe_1/jsons/geral/').split(os.pathsep)
+
+    for dir in manpath:
+        print "Crawling", dir
+        for name in os.listdir(dir):
+            path = os.path.join(dir, name)
+            if os.path.isdir(path):
+                indexDirectory(path,writer)
+    writer.commit()
+    writer.close()
+>>>>>>> 48816cc331d42091955b88de0d1a50fcb30458ae
