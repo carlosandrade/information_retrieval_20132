@@ -1,8 +1,14 @@
 <?php
 include 'vendor/autoload.php';
+include 'InformationRetrieval/Analyzer/Stemmer.php';
 
-use Symfony\Component\DomCrawler\Crawler;
+use InformationRetrieval\Analyzer\Stemmer;
 
+/**
+ * Class Spider
+ *
+ * Robo que faz extracao dos dados dos sites definidos
+ */
 class Spider {
     /**
      * PHP Crawler objeto
@@ -45,24 +51,9 @@ class Spider {
      */
     protected $websites = array(
         array(
-            'name' => 'galaticosonline',
-            'baseUrl' => 'http://www.galaticosonline.com',
-            'paginationLimit' => 2,
-            'startPage' => 0,
-            'list' => array(
-                'typeLink' => 'relative',
-                'endPoint' => '/noticias,,{page}.html',
-                'filter' => '//div[@class="posts"]/ul/li/div[@class="description clearfix "]/h2/a',
-            ),
-            'scan' => array(
-                'title' => '//h1[@class="box-titulo"]',
-                'text' => '//div[@class="single-content"]/p',
-            )
-        ),
-        array(
             'name' => 'globoesporte',
             'baseUrl' => 'http://globoesporte.globo.com',
-            'paginationLimit' => 3,
+            'paginationLimit' => 100,
             'startPage' => 1,
             'list' => array(
                 'typeLink' => 'absolut',
@@ -72,6 +63,39 @@ class Spider {
             'scan' => array(
                 'title' => '//div[@class="materia-titulo"]/h1',
                 'text' => '//div[@class="corpo-conteudo"]/p',
+                'datetime' => '//abbr[@class="published"]/time',
+            ),
+        ),
+        array(
+            'name' => 'terra',
+            'baseUrl' => 'http://esportes.terra.com.br',
+            'paginationLimit' => 100,
+            'startPage' => 1,
+            'list' => array(
+                'typeLink' => 'absolut',
+                'endPoint' => '/futebol/ultimas/?&vgnpage={page}',
+                'filter' => '//div[@class="list articles"]/ol/li/a',
+            ),
+            'scan' => array(
+                'title' => '//h2[@class="ttl-main"]',
+                'text' => '//div[@id="news-container"]/p',
+                'datetime' => '//time[@itemprop="datePublished"]',
+            )
+        ),
+        array(
+            'name' => 'lancenet',
+            'baseUrl' => 'http://www.lancenet.com.br',
+            'paginationLimit' => 100,
+            'startPage' => 1,
+            'list' => array(
+                'typeLink' => 'relative',
+                'endPoint' => '/futebol/?page={page}',
+                'filter' => '//div[@class="mt"]/a[1]',
+            ),
+            'scan' => array(
+                'title' => '//h1[@class="article-title"]',
+                'text' => '//div[@class="mt news-body"]/p',
+                'datetime' => '//div[@class="mt news-body"]/p[@class="date"]/span/span',
             )
         ),
     );
@@ -95,9 +119,13 @@ class Spider {
      */
     public function run()
     {
-        $this->goutte = new Goutte\Client(); // instancia lib do crawler
+        // instancia lib do crawler
+        // Define user agent como browser chrome
+        $this->goutte = new Goutte\Client(
+            array('HTTP_USER_AGENT' => 'Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36')
+        );
 
-        //echo "<pre>";
+        //  Percorre difinicoes dos sites
         foreach ($this->websites as $website) {
             $this->getList($website); // Pega lista de links
             $this->scan($website); // Scaneia links da lista
@@ -117,6 +145,7 @@ class Spider {
     {
         // para quantidade de paginas configuradas
         for ($page = $website['startPage']; $page < $website['paginationLimit']; $page++) {
+            echo "List data from {$website['name']} page {$page}\n";
             // Monta url de destino
             $url = $website['baseUrl'] . str_replace('{page}', $page, $website['list']['endPoint']);
 
@@ -132,6 +161,9 @@ class Spider {
                 );
 
             $this->list = array_merge($this->list, $list); // junta links das paginas
+            $wait = rand(5, 10);
+            echo "Waiting {$wait} seconds...\n";
+            sleep($wait);
         }
     }
 
@@ -148,22 +180,51 @@ class Spider {
 
             // Monta url
             if ($website['list']['typeLink'] == 'relative') {
-                $url = $website['baseUrl'] . $list;
+                if (!strpos($list, "http")) {
+                    $url = $website['baseUrl'] . "/" . $list;
+                }
             }
 
+            echo "Get data from page {$url}\n";
             // Pega pagina
             $crawler = $this->goutte->request('GET', $url);
 
             // Pega informaçoes da pagina
-            $data = array();
+            $data = array(
+                'url' => $url,
+                'taxonomy' => '',
+            );
             foreach ($website['scan'] as $key => $filter) {
-                $str = strip_tags($crawler->filterXPath($filter)->text());
-                $str = preg_replace($this->stop_words, "", $str);
-                $data[$key] = $str;
+                try {
+                    $elem = $crawler->filterXPath($filter);
+
+                    if (count($elem) > 1) {
+                        $str = '';
+                        foreach ($elem as $el) {
+                            $str .= " " . $el->textContent;
+                        }
+                    } else {
+                        $str = $elem->text();
+                    }
+                    //$str = strip_tags($crawler->filterXPath($filter)->text());
+                    $strProccess = preg_replace($this->stop_words, "", $str);
+                    $data['taxonomy'] = $this->stem($strProccess, $data['taxonomy']);
+                    $data[$key] = $this->callbacks($website['name'], $key, $str);
+
+                    if ($key == 'datetime') {
+                        echo "$str\n";
+                        echo "{$data[$key]}\n\n";
+                    }
+                } catch (Exception $e) {
+                    $data[$key] = '';
+                }
             }
 
             // coloca na lista de resultados
             $this->result[$website['name']][] = $data;
+            $wait = rand(5, 10);
+            echo "Waiting {$wait} seconds...\n";
+            sleep($wait);
         }
     }
 
@@ -181,8 +242,89 @@ class Spider {
             file_put_contents($dir . DIRECTORY_SEPARATOR . $entry . ".json", json_encode($data));
         }
     }
+
+    /**
+     * Stemming dos dados extraidos
+     *
+     * @param $str
+     * @param string $taxonomy
+     * @return string
+     */
+    public function stem($str, $taxonomy = '') {
+        $stemmer = new Stemmer();
+        $tokens = explode(' ', $str);
+        $tax = array();
+
+        if (!empty($taxonomy)) {
+            $tax = explode(' ', $taxonomy);
+        }
+
+        foreach ($tokens as $token) {
+            $term = iconv("ASCII", "utf-8", $token);
+            $stem = $stemmer->stem($term);
+
+            if (!empty($stem) && !in_array($stem, $tax)) {
+                $tax[] = $stem;
+            }
+        }
+
+        return implode(' ', $tax);
+    }
+
+    public function callbacks($website, $key, $value)
+    {
+        $callbacks = array(
+            'globoesporte' => array(
+                'datetime' => function($str) {
+                    $pieces = explode("/", explode(" ", $str)[0]);
+
+                    return implode("", array_reverse($pieces));
+                },
+            ),
+            'lancenet' => array(
+                'datetime' => function($str) {
+                    $pieces = explode("/", explode(" ", $str)[0]);
+
+                    return implode("", array_reverse($pieces));
+                },
+            ),
+            'terra' => array(
+                'datetime' => function($str) {
+                    $pieces = explode(" ", $str);
+
+                    $month = array(
+                        'Janeiro' => '01',
+                        'Fevereiro' => '02',
+                        'Março' => '03',
+                        'abril' => '04',
+                        'Maio' => '05',
+                        'Junho' => '06',
+                        'Julho' => '07',
+                        'Agosto' => '08',
+                        'Setembro' => '09',
+                        'Outubro' => '10',
+                        'Novembro' => '11',
+                        'Dezembro' => '12',
+                    );
+
+                    return $pieces[4] . $month[$pieces[2]] . $pieces[0];
+                },
+            )
+        );
+
+        if (!empty($callbacks[$website][$key])) {
+            return $callbacks[$website][$key]($value);
+        }
+
+        return $value;
+    }
 }
 
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+// Roda o spider
+echo "Start\n";
 $sp = new Spider();
 $sp->run();
 $sp->save();
+echo "End\n";

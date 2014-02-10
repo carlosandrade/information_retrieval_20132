@@ -1,18 +1,45 @@
 <?php
 include 'vendor/autoload.php';
+include 'InformationRetrieval/Analyzer/TextMining.php';
 
 use ZendSearch\Lucene;
+use InformationRetrieval\Analyzer\TextMining;
 
-class Indexer {
+/**
+ * Class Indexer
+ * Ler dados extraidos das paginas dos arquivos json
+ */
+class Indexer
+{
+    /**
+     * Classificador das noticias
+     *
+     * @var TextMining
+     */
+    protected $classifier = null;
+
+    /**
+     * Inicializador da classe
+     *
+     * @param TextMining $classifier
+     */
+    public function __construct($classifier)
+    {
+        $this->classifier = $classifier;
+    }
 
     /**
      * Indexa dados nos arquivos de json
      */
     public function index()
     {
-        $dir = realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "data" .DIRECTORY_SEPARATOR;
+        // Definiçao das localizaçoes dos arquivos
+        $dir = realpath(dirname(__FILE__)) . DIRECTORY_SEPARATOR . "data" . DIRECTORY_SEPARATOR;
         $jsonDir = $dir . "json";
         $indexDir = $dir . "index";
+
+        // Cria indice
+        $index = Lucene\Lucene::create($indexDir . DIRECTORY_SEPARATOR . "futebol");
 
         // ler aquivos json
         $files = scandir($jsonDir);
@@ -24,15 +51,18 @@ class Indexer {
             // Se arquivo existe
             if (is_file($jsonDir . DIRECTORY_SEPARATOR . $file)) {
                 $json = json_decode(file_get_contents($jsonDir . DIRECTORY_SEPARATOR . $file));
-                $indexName = substr($file, 0, -5);
-                // Cria index
-                $index = Lucene\Lucene::create($indexDir . DIRECTORY_SEPARATOR . $indexName);
 
                 // Cria documento e define campos para indexar
                 foreach ($json as $entry) {
                     $doc = new Lucene\Document();
-                    $doc->addField(Lucene\Document\Field::Text('url', $entry->title));
-                    $doc->addField(Lucene\Document\Field::UnStored('contents', $entry->text));
+                    $doc->addField(Lucene\Document\Field::Text('url', $entry->url));
+                    $doc->addField(Lucene\Document\Field::Text('title', $entry->title));
+                    //$doc->addField(Lucene\Document\Field::Text('taxonomy', $entry->taxonomy));
+                    $doc->addField(Lucene\Document\Field::Keyword('group', $this->classifier->classify($entry->title)));
+                    $doc->addField(Lucene\Document\Field::Text('text', $entry->text));
+                    $doc->addField(Lucene\Document\Field::Keyword('datetime', $entry->datetime));
+
+                    // Adiciona documento ao index
                     $index->addDocument($doc);
                 }
             }
@@ -40,5 +70,14 @@ class Indexer {
     }
 }
 
-$ix = new Indexer();
+// instancia o classificador
+$tm = new TextMining();
+// Carrega dados de treino
+$tm->loadData("/home/helder/PhpstormProjects/InformationRetrieval20132/equipe_4/data/training.json");
+// Executa o treinamento
+$tm->training();
+
+// Instancia o indexador
+$ix = new Indexer($tm);
+// Indexa os dados
 $ix->index();

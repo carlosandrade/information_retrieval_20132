@@ -21,6 +21,7 @@
     "require": {
         "php": ">=5.3.0",
         "fabpot/goutte": "dev-master",
-        "bojaspus/zendsearch": "dev-master"
+        "bojaspus/zendsearch": "dev-master",
+        "hybridlogic/classifier": "dev-master"
     }
 }

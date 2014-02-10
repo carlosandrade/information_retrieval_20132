@@ -1,0 +1,194 @@
+/* 
+    Document   : style
+    Created on : 09/02/2014, 16:22:54
+    Author     : Tácio
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+root { 
+    display: block;
+}
+
+body{
+    background:url("../futebol1.jpg") center top;
+}
+
+#divBusca {
+    width: 380px;
+    height: 60px;
+    margin:0 auto;
+}
+
+#divBusca input[type=text]{
+    padding:10px;
+    background:#fff;
+    width:300px;
+    height:40px;
+    font-size:14px;
+    border-radius: 10px;
+}
+
+#divBusca input[type=submit]{
+    float:left;
+}
+
+#txtBusca {
+    float: left;
+    background-color: transparent;
+    padding-left: 5px;
+    font-size: 18px;
+    border: none;
+    height: 32px;
+    width: 200px;
+}
+
+#btnBusca {
+    border: none;
+    float: left;
+    height: 39px;
+    border-radius: 7px 7px 7px 7px;
+    width: 70px;
+    margin:0 0 0 10px;
+    font-weight: bold;
+    padding:5px;
+}
+
+#btnBusca:hover{
+    background:#bac4ba;
+    cursor:pointer;
+}
+
+#divBusca img {
+    float: left;
+}
+
+#divg {
+    margin: 0 auto;
+    text-align:center;
+} 
+
+#divg h1{
+    font-family:"arial";
+    color:#fff;
+    font-size:55px;
+    text-shadow:3px 1px 13px #E8FD93;
+}
+
+#imagens {
+    height: 100%;
+    background-image: url(bola.png);
+    background-repeat: no-repeat;
+    margin-left: 30%;
+    margin-top: 5%;
+    width:950px;
+    margin: 0 auto;
+    filter: alpha(opacity=10);
+}
+#advancedLink {
+    float:left;
+    clear:both;
+    margin:10px 0 0 0;
+    color:#fff;
+    font-family:"arial";
+    color:#fff!important;
+    font-size:14px;
+}
+#advancedLink a:link { text-decoration: none;color:#fff!important;margin:10px 5px 5px 5px; }
+#advancedLink a:visited { text-decoration: none; color: #fff}
+#advancedLink a:active { text-decoration: none; color: #fff}
+#advancedLink a:hover { color: #fff;}
+#advanced {
+    border-radius:5px;
+    background:#fff;
+    width:400px;
+    padding:0 0 10px 0;
+    height:150px;
+    margin:80px 0 0 0;
+    position:relative;
+}
+
+.seta-cima {
+    width: 0;
+    position:absolute;
+    top:-9px;
+    left:57px;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #fff;
+}
+
+#advanced input,#advanced label{
+    float:left;
+}
+
+#advanced label{
+    margin:0 30px 0 0;
+}
+
+#mes h2,#ano h2{
+    float:left;
+    margin:16px 10px 10px 10px;
+}
+
+form{
+    float:left;
+}
+
+.lista{
+    clear:both;
+}
+
+#checkbox{
+    padding:5px;
+}
+
+#checkbox h2{
+    text-align:left;
+    margin:5px;
+}
+
+#checkbox,#mes,#ano{
+    float:left;
+    font-family:"arial";
+    font-size:14px;
+    color:#999;
+    width:100%;
+}
+#mes{
+    clear:both;
+    width:50%;
+}
+#ano{
+    width:50%;
+}
+
+select{
+    padding:5px;
+}
+
+
+.item{
+    background:#fff;
+    border-radius:10px;
+    padding:5px 10px 10px 10px;
+    float:left;
+    margin:10px 0;
+    width:100%;
+    font-size:14px;
+    font-family:"Tahoma";
+}
+
+.item a{
+    color:#333;
+}
+
+.group{
+    color:#059401;
+}
